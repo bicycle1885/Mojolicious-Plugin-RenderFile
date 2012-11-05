@@ -4,7 +4,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use strict;
 use warnings;
 use File::Basename;
-use Mojo::Util 'quote';
+use Mojo::Util qw/ quote encode /;
 
 our $VERSION = '0.05';
 
@@ -45,6 +45,7 @@ sub register {
 
         # Create response headers
         $filename = quote($filename); # quote the filename, per RFC 5987
+        $filename = encode "UTF-8", $filename;
 
         my $headers = Mojo::Headers->new();
         $headers->add( 'Content-Type', $content_type . ';name=' . $filename );
