@@ -4,6 +4,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use strict;
 use warnings;
 use File::Basename;
+use Encode qw/ decode_utf8 /;
 use Mojo::Util qw/ quote encode /;
 
 our $VERSION = '0.05';
@@ -15,7 +16,7 @@ sub register {
         my $c        = shift;
         my %args     = @_;
 
-        my $filename            = $args{filename};
+        my $filename            = decode_utf8 $args{filename};
         my $status              = $args{status}               || 200;
         my $content_disposition = $args{content_disposition}  || 'attachment';
 
@@ -26,7 +27,7 @@ sub register {
 
         # Create asset
         my $asset;
-        if ( my $filepath = $args{filepath} ) {
+        if ( my $filepath = decode_utf8 $args{filepath} ) {
             unless ( -f $filepath && -r $filepath ) {
                 $c->app->log->error("Cannot read file [$filepath]. error [$!]");
                 return;

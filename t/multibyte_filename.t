@@ -18,7 +18,9 @@ plugin 'RenderFile';
 
 get "/default" => sub {
     my $self = shift;
-    $self->render_file( filepath => $FILE );
+    $self->render_file(
+        filepath => $FILE
+    );
 };
 
 get "/filename" => sub {
@@ -26,6 +28,21 @@ get "/filename" => sub {
     $self->render_file(
         filepath => $FILE,
         filename => '別名.txt',
+    );
+};
+
+get "/encoded" => sub {
+    my $self = shift;
+    $self->render_file(
+        filepath => encode_utf8 $FILE,
+    );
+};
+
+get "/encoded_filename" => sub {
+    my $self = shift;
+    $self->render_file(
+        filepath => encode_utf8 $FILE,
+        filename => encode_utf8 '別名.txt',
     );
 };
 
@@ -38,6 +55,14 @@ $t->get_ok("/default")
     ->header_is( 'Content-Disposition' => encode_utf8 'attachment;filename="漢字.txt"' );
 
 $t->get_ok("/filename")
+    ->status_is(200)
+    ->header_is( 'Content-Disposition' => encode_utf8 'attachment;filename="別名.txt"' );
+
+$t->get_ok("/encoded")
+    ->status_is(200)
+    ->header_is( 'Content-Disposition' => encode_utf8 'attachment;filename="漢字.txt"' );
+
+$t->get_ok("/encoded_filename")
     ->status_is(200)
     ->header_is( 'Content-Disposition' => encode_utf8 'attachment;filename="別名.txt"' );
 
